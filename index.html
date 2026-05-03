@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
+<title>PM Interview Suite</title>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="PM Prep"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#0B0B14"/>
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxODAgMTgwIj48cmVjdCB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgcng9IjQwIiBmaWxsPSIjMEIwQjE0Ii8+PHRleHQgeD0iOTAiIHk9IjExNSIgZm9udC1zaXplPSI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI0YwNjI1MCIgZm9udC1mYW1pbHk9InNlcmlmIiBmb250LXdlaWdodD0iYm9sZCI+UE08L3RleHQ+PC9zdmc+"/>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,700;9..144,800&family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+--bg:#0B0B14;--s1:#141424;--s2:#1C1C34;--s3:#26264A;
+--tx:#EEEEF6;--tx2:#A0A0C0;--tx3:#606088;
+--accent:#F06250;--accent2:#FF8A6E;--green:#3DD68C;--amber:#FBC94A;
+--r:16px;--st:env(safe-area-inset-top,0px);--sb:env(safe-area-inset-bottom,0px);
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--tx);font-family:'Outfit',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:0}
+textarea{font-family:inherit;-webkit-appearance:none;border:none;outline:none}
+button{font-family:inherit;border:none;cursor:pointer;-webkit-appearance:none}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.content{position:fixed;top:0;left:0;right:0;bottom:calc(58px + var(--sb));overflow-y:auto;-webkit-overflow-scrolling:touch;padding-top:var(--st)}
+.page{display:none;animation:fadeUp .3s ease both}
+.page.active{display:block}
+
+/* Tab bar */
+.tabs{position:fixed;bottom:0;left:0;right:0;display:flex;background:rgba(11,11,20,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,.05);padding:4px 0 calc(4px + var(--sb));z-index:100}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 2px;background:none;color:var(--tx3);font-size:9px;font-weight:600;position:relative;transition:color .2s}
+.tab.on{color:var(--accent)}
+.tab.on::after{content:'';position:absolute;top:-1px;left:50%;transform:translateX(-50%);width:16px;height:2.5px;border-radius:2px;background:var(--accent)}
+.tab span{font-size:18px;line-height:1}
+
+/* Utilities */
+.hdr{padding:22px 20px 12px;position:relative}
+.hdr::before{content:'';position:absolute;top:0;left:0;right:0;height:100px;background:radial-gradient(ellipse at 30% 0%,rgba(240,98,80,.1),transparent 70%);pointer-events:none}
+.hdr h1{font-family:'Fraunces',serif;font-size:24px;font-weight:800;color:#fff;position:relative}
+.hdr p{color:var(--tx3);font-size:12px;margin-top:3px;position:relative}
+.card{background:var(--s1);border:1px solid rgba(255,255,255,.05);border-radius:var(--r);margin:0 16px 10px;padding:18px}
+.warn-box{padding:12px 14px;margin:0 16px 12px;border-radius:12px;background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.25);font-size:12px;color:var(--amber);font-weight:600;display:flex;gap:8px;align-items:center}
+.warn-box button{padding:5px 12px;border-radius:7px;background:var(--amber);color:#0B0B14;font-size:11px;font-weight:800;margin-left:auto;white-space:nowrap}
+.green-badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:10px;font-weight:800;letter-spacing:.5px;background:rgba(61,214,140,.1);border:1px solid rgba(61,214,140,.25);color:var(--green);margin:0 16px 10px}
+.btn{padding:12px 24px;border-radius:12px;font-weight:700;font-size:14px;transition:transform .12s,opacity .12s}
+.btn:active{transform:scale(.96);opacity:.8}
+.bp{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.bs{background:var(--s2);color:var(--tx);border:1px solid rgba(255,255,255,.07)}
+.ta{width:100%;min-height:120px;padding:14px;border-radius:14px;background:var(--s2);color:var(--tx);font-size:14px;line-height:1.7;resize:vertical;border:1.5px solid rgba(255,255,255,.07)}
+.ta:focus{border-color:var(--accent)}
+.ta::placeholder{color:var(--tx3)}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:6px 14px;border-radius:20px;font-size:11px;font-weight:700;border:1.5px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);color:var(--tx2);white-space:nowrap;transition:all .2s}
+.chip.on{border-color:var(--accent);background:rgba(240,98,80,.1);color:var(--accent)}
+.shimmer{background:linear-gradient(90deg,var(--s2) 25%,var(--s3) 50%,var(--s2) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:8px;height:80px}
+.toast{position:fixed;top:calc(16px + var(--st));left:50%;transform:translateX(-50%);padding:10px 22px;border-radius:12px;background:var(--green);color:#0B0B14;font-size:13px;font-weight:700;z-index:1000;animation:fadeUp .25s ease}
+
+/* Upload */
+.upload-zone{border:2px dashed rgba(255,255,255,.12);border-radius:16px;padding:36px 20px;text-align:center;cursor:pointer;transition:all .3s;background:rgba(255,255,255,.02);margin:0 16px 16px}
+.upload-zone.ok{border-color:var(--green);border-style:solid;background:rgba(61,214,140,.05)}
+.spinner{width:24px;height:24px;border:3px solid var(--s3);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;margin:0 auto 8px}
+
+/* Timer */
+.timer-num{font-family:'JetBrains Mono',monospace;font-size:56px;font-weight:700;text-align:center;letter-spacing:3px;color:#fff}
+.timer-num.red{color:var(--accent);animation:pulse 1s infinite}
+</style>
+</head>
+<body>
+
+<div class="content" id="content"></div>
+
+<nav class="tabs" id="tabs"></nav>
+
+<div class="toast" id="toast" style="display:none"></div>
+
+<script>
+// ─── Data ───
+const TABS=[
+  {id:"pitch",icon:"🎤",label:"Pitch"},
+  {id:"behavioral",icon:"🧠",label:"Behavioral"},
+  {id:"strategy",icon:"♟️",label:"Strategy"},
+  {id:"improve",icon:"📈",label:"Improve"},
+  {id:"design",icon:"✏️",label:"Design"},
+  {id:"metrics",icon:"📊",label:"Metrics"},
+  {id:"execution",icon:"⚙️",label:"Execution"},
+  {id:"mock",icon:"🎯",label:"Mock"},
+  {id:"profile",icon:"👤",label:"Resume"},
+];
+const COLORS={behavioral:"#5B8DEF",strategy:"#A78BFA",improve:"#3DD68C",design:"#FB923C",metrics:"#36D6E7",execution:"#F472B6"};
+const QUESTIONS={
+behavioral:[
+"Tell me about a time you made a difficult trade-off between speed and quality.",
+"Describe when you disagreed with an engineering lead on product direction.",
+"Tell me about a product launch that didn't meet expectations. What did you learn?",
+"Give an example of using data to influence a product decision.",
+"Describe managing multiple stakeholders with conflicting priorities.",
+"Tell me about saying 'no' to a feature request from a senior leader.",
+"How did you handle your team missing a critical deadline?",
+"Describe building consensus across cross-functional teams.",
+"Tell me about identifying a customer need that wasn't being addressed.",
+"Give an example of mentoring or developing a team member.",
+],
+strategy:[
+"How would you develop a 3-year product strategy for a new market entry?",
+"Your product is losing market share. What's your strategy?",
+"How would you decide to build, buy, or partner for a new capability?",
+"Walk me through evaluating AI/ML integration for your product.",
+"How do you balance platform stability vs. new feature innovation?",
+"Leadership wants to pivot the product. How do you evaluate?",
+"How would you create a platform strategy from a single-product company?",
+"Describe pricing strategy for a new B2B SaaS product.",
+"How would you approach international expansion?",
+"What framework do you use to identify new product opportunities?",
+],
+improve:[
+"How would you improve seller onboarding on a marketplace?",
+"How would you improve product discovery on a platform with millions of items?",
+"Pick a product you use daily — what would you change?",
+"How would you improve the checkout experience on a major e-commerce site?",
+"How would you reduce churn for a subscription product?",
+"How would you improve cross-border selling on a global marketplace?",
+"How would you improve search relevance on a large platform?",
+"How would you improve the returns experience for online purchases?",
+"How would you improve Slack for remote teams?",
+"How would you improve LinkedIn for job seekers?",
+],
+design:[
+"Design a seller intelligence dashboard for marketplace vendors.",
+"Design a product for small businesses to manage multi-channel inventory.",
+"Design a compliance automation tool for sellers across regions.",
+"Design an AI-powered listing assistant for new sellers.",
+"Design a dispute resolution system for a two-sided marketplace.",
+"Design a product to help elderly people stay connected with family.",
+"Design a mental health check-in tool for the workplace.",
+"Design a fraud detection system for marketplace transactions.",
+"Design a tool for freelancers to manage finances.",
+"Design a product to reduce food waste in restaurants.",
+],
+metrics:[
+"How would you measure the success of a new feature launch?",
+"What metrics would you track for a two-sided marketplace?",
+"How would you set up an A/B test for a pricing change?",
+"Define the north star metric for a marketplace platform.",
+"How would you measure product-market fit for an early-stage product?",
+"What metrics evaluate subscription vs. freemium models?",
+"How do you distinguish vanity metrics from actionable metrics?",
+"How would you measure the ROI of a platform migration?",
+"What metrics track catalog quality and listing completeness?",
+"How would you build a metrics dashboard for executive stakeholders?",
+],
+execution:[
+"5 features requested, resources for 2. How do you prioritize?",
+"Critical bug right before a major launch. What do you do?",
+"Walk me through your sprint planning process.",
+"How do you manage tech debt while shipping new features?",
+"Engineering pushes back on the timeline. What do you do?",
+"How do you write effective PRDs for complex platform products?",
+"Describe managing a product launch across multiple teams.",
+"How do you handle scope creep on a multi-quarter initiative?",
+"Walk me through running a product review with leadership.",
+"How do you ensure data quality when scaling rapidly?",
+],
+};
+const PITCH_STEPS=[
+{label:"Hook",time:"0–15s",tip:"Compelling one-liner about who you are and what drives you.",icon:"⚡"},
+{label:"Background",time:"15–40s",tip:"Briefly cover relevant experience — roles, industries, skills.",icon:"📍"},
+{label:"Highlight",time:"40–70s",tip:"1–2 impactful achievements with concrete metrics.",icon:"🏆"},
+{label:"Why Here",time:"70–90s",tip:"Connect your experience to this specific role and company.",icon:"🎯"},
+{label:"Close",time:"90–120s",tip:"End with enthusiasm and what unique value you bring.",icon:"🤝"},
+];
+
+// ─── State ───
+let currentTab="pitch";
+let profile="";
+let fileName="";
+let timerInterval=null;
+let mockState={};
+
+try{profile=localStorage.getItem("pm_profile")||"";fileName=localStorage.getItem("pm_filename")||""}catch(e){}
+
+function saveProfile(){try{localStorage.setItem("pm_profile",profile);localStorage.setItem("pm_filename",fileName)}catch(e){}}
+function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.style.display="block";setTimeout(()=>t.style.display="none",2500)}
+function fmt(s){return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")}
+function wordCount(s){return s.trim()?s.trim().split(/\s+/).length:0}
+function el(tag,cls,html){const e=document.createElement(tag);if(cls)e.className=cls;if(html!==undefined)e.innerHTML=html;return e}
+
+// ─── AI Call ───
+async function callAI(prompt){
+  try{
+    const r=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,messages:[{role:"user",content:prompt}]})
+    });
+    const d=await r.json();
+    return d.content?.map(i=>i.text||"").join("\n")||"Error generating response.";
+  }catch(e){return "Connection error. Check your internet and try again."}
+}
+
+// ─── PDF extraction ───
+async function extractPDF(file){
+  return new Promise((resolve,reject)=>{
+    const script=document.createElement("script");
+    script.src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
+    script.onload=async()=>{
+      try{
+        pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+        const buf=await file.arrayBuffer();
+        const pdf=await pdfjsLib.getDocument({data:buf}).promise;
+        let text="";
+        for(let i=1;i<=pdf.numPages;i++){
+          const pg=await pdf.getPage(i);
+          const c=await pg.getTextContent();
+          text+=c.items.map(x=>x.str).join(" ")+"\n\n";
+        }
+        resolve(text.trim());
+      }catch(e){reject(e)}
+    };
+    script.onerror=()=>reject(new Error("Could not load PDF reader"));
+    document.head.appendChild(script);
+  });
+}
+
+// ─── Tab Bar ───
+function renderTabs(){
+  const nav=document.getElementById("tabs");
+  nav.innerHTML="";
+  TABS.forEach(t=>{
+    const b=el("button","tab"+(currentTab===t.id?" on":""));
+    b.innerHTML=`<span>${t.icon}</span>${t.label}`;
+    b.onclick=()=>{currentTab=t.id;renderTabs();renderPage()};
+    nav.appendChild(b);
+  });
+}
+
+// ─── Warn Banner ───
+function warnHTML(){
+  return `<div class="warn-box">⚠️ <span>Upload your resume for personalized answers</span><button onclick="currentTab='profile';renderTabs();renderPage()">Upload →</button></div>`;
+}
+
+// ─── Render Page ───
+function renderPage(){
+  clearInterval(timerInterval);
+  const c=document.getElementById("content");
+  c.scrollTop=0;
+  if(currentTab==="profile")renderProfile(c);
+  else if(currentTab==="pitch")renderPitch(c);
+  else if(currentTab==="mock")renderMock(c);
+  else renderQA(c,currentTab);
+}
+
+// ═══════════════════════════════════════
+// PROFILE / RESUME PAGE
+// ═══════════════════════════════════════
+function renderProfile(c){
+  c.innerHTML=`
+  <div class="hdr"><h1>👤 Resume / Profile</h1><p>Upload your resume to personalize everything</p></div>
+  <div class="upload-zone ${profile?"ok":""}" id="upzone">
+    <input type="file" accept=".pdf,.txt" id="fileinput" style="display:none"/>
+    <div id="upstatus">
+      ${profile
+        ?`<div style="font-size:40px;margin-bottom:10px">✅</div>
+           <div style="color:var(--green);font-size:15px;font-weight:700">Resume Loaded</div>
+           <div style="color:var(--tx2);font-size:12px;margin-top:4px">${fileName||"Pasted text"} · ${wordCount(profile)} words</div>
+           <div style="color:var(--accent);font-size:12px;font-weight:700;margin-top:12px">Tap to upload a different resume</div>`
+        :`<div style="font-size:40px;margin-bottom:10px">📄</div>
+           <div style="color:var(--tx);font-size:15px;font-weight:700">Upload Your Resume</div>
+           <div style="color:var(--tx2);font-size:12px;margin-top:4px">Tap to select a PDF or text file</div>`}
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;margin:0 16px 16px">
+    <div style="flex:1;height:1px;background:rgba(255,255,255,.08)"></div>
+    <div style="color:var(--tx3);font-size:11px;font-weight:700">OR PASTE TEXT</div>
+    <div style="flex:1;height:1px;background:rgba(255,255,255,.08)"></div>
+  </div>
+  <div style="padding:0 16px 120px">
+    <textarea class="ta" id="profiletext" style="min-height:200px" placeholder="Paste your resume or key experience here...">${profile}</textarea>
+    <div style="display:flex;gap:10px;margin-top:14px">
+      <button class="btn bp" style="flex:1" id="savebtn" ${!profile?"disabled":""}>💾 Save Profile</button>
+      ${profile?`<button class="btn bs" style="padding:12px 18px" id="clearbtn">🗑️</button>`:""}
+    </div>
+    <div style="color:var(--tx3);font-size:11px;margin-top:12px;text-align:center;line-height:1.6">
+      Saved locally on this device · Powers all AI features<br/>Upload a new resume anytime to update
+    </div>
+  </div>`;
+
+  const zone=document.getElementById("upzone");
+  const inp=document.getElementById("fileinput");
+  zone.onclick=()=>inp.click();
+
+  inp.onchange=async(e)=>{
+    const file=e.target.files?.[0];
+    if(!file)return;
+    const status=document.getElementById("upstatus");
+    status.innerHTML=`<div class="spinner"></div><div style="color:var(--tx2);font-size:13px;font-weight:600">Reading file...</div>`;
+    try{
+      let text="";
+      if(file.name.toLowerCase().endsWith(".pdf")){
+        text=await extractPDF(file);
+      }else{
+        text=await file.text();
+      }
+      profile=text;fileName=file.name;saveProfile();
+      showToast("✓ Resume uploaded & saved!");
+      renderProfile(c);
+    }catch(err){
+      showToast("Error reading file. Try pasting text instead.");
+      console.error(err);
+      renderProfile(c);
+    }
+  };
+
+  const ta=document.getElementById("profiletext");
+  ta.oninput=()=>{profile=ta.value;fileName=""};
+
+  document.getElementById("savebtn").onclick=()=>{
+    if(!profile)return;
+    saveProfile();showToast("✓ Profile saved!");renderProfile(c);
+  };
+
+  const cb=document.getElementById("clearbtn");
+  if(cb)cb.onclick=()=>{profile="";fileName="";saveProfile();showToast("Profile cleared");renderProfile(c)};
+}
+
+// ═══════════════════════════════════════
+// ELEVATOR PITCH
+// ═══════════════════════════════════════
+function renderPitch(c){
+  let dur=120,left=120,running=false,pitchText="",genText="",showGen=false;
+
+  function draw(){
+    const pct=((dur-left)/dur)*100;
+    const sec=Math.min(Math.floor((pct/100)*PITCH_STEPS.length),PITCH_STEPS.length-1);
+    const wc=wordCount(pitchText);
+
+    c.innerHTML=`
+    <div class="hdr"><h1>🎤 Elevator Pitch</h1><p>Master your "Tell me about yourself"</p></div>
+    ${!profile?warnHTML():""}
+    <div style="padding:0 16px 10px;display:flex;gap:8px">
+      ${[60,90,120].map(d=>`<button class="chip ${dur===d?"on":""}" data-dur="${d}">${d===60?"1 min":d===90?"1.5 min":"2 min"}</button>`).join("")}
+    </div>
+    <div class="card" style="background:linear-gradient(145deg,#141424,#0B0B14);text-align:center;position:relative;overflow:hidden">
+      <div style="position:absolute;bottom:0;left:0;height:3px;background:var(--accent);width:${pct}%;transition:width 1s linear;border-radius:2px"></div>
+      <div class="timer-num ${left<=10&&left>0?"red":""}">${fmt(left)}</div>
+      ${running?`<div style="color:var(--accent);font-size:12px;font-weight:600;margin-top:6px;padding:0 10px">${PITCH_STEPS[sec].icon} <strong>${PITCH_STEPS[sec].label}</strong> — ${PITCH_STEPS[sec].tip}</div>`:""}
+      <div style="display:flex;justify-content:center;gap:10px;margin-top:16px">
+        ${!running
+          ?`<button class="btn bp" id="startbtn">▶ Start</button>`
+          :`<button class="btn" style="background:var(--amber);color:#0B0B14" id="pausebtn">⏸ Pause</button>`}
+        <button class="btn bs" id="resetbtn">↺ Reset</button>
+      </div>
+    </div>
+    <div style="padding:8px 16px">
+      <h3 style="font-family:'Fraunces',serif;font-size:17px;margin-bottom:10px">Pitch Structure</h3>
+      ${PITCH_STEPS.map((s,i)=>`
+        <div style="background:var(--s1);border:1px solid ${running&&sec===i?"var(--accent)":"rgba(255,255,255,.05)"};border-radius:14px;padding:14px 16px;margin-bottom:8px;display:flex;gap:12px;align-items:flex-start;${running&&sec===i?"background:rgba(240,98,80,.06)":""}">
+          <div style="min-width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;background:${running&&sec===i?"var(--accent)":"var(--s2)"};color:${running&&sec===i?"#fff":"var(--tx2)"}">${i+1}</div>
+          <div>
+            <div style="font-weight:700;font-size:13px">${s.icon} ${s.label} <span style="font-weight:400;color:var(--tx3)">(${s.time})</span></div>
+            <div style="font-size:12px;color:var(--tx2);margin-top:2px">${s.tip}</div>
+          </div>
+        </div>`).join("")}
+    </div>
+    ${profile?`<div style="padding:4px 16px"><button class="btn bp" style="width:100%;font-size:12px;padding:10px 16px;border-radius:10px" id="genpitch">✨ Generate Pitch From Your Resume</button></div>`:""}
+    ${showGen?`<div class="card" style="margin-top:8px;border:1px solid rgba(240,98,80,.15);background:rgba(240,98,80,.04)">
+      <div id="genarea">${genText?`<div style="font-size:13px;line-height:1.8;color:var(--tx2);white-space:pre-wrap">${genText}</div><button class="btn bs" style="width:100%;margin-top:12px;font-size:12px;padding:8px 16px;border-radius:9px" id="usedraft">📋 Use This as My Draft</button>`:`<div class="shimmer"></div>`}</div>
+    </div>`:""}
+    <div style="padding:12px 16px 110px">
+      <h3 style="font-family:'Fraunces',serif;font-size:17px;margin-bottom:10px">Your Draft</h3>
+      <textarea class="ta" id="pitchta" style="min-height:160px" placeholder="Write your pitch here or generate one above...">${pitchText}</textarea>
+      <div style="color:var(--tx3);font-size:11px;margin-top:6px">${wc} words · ~${Math.ceil(wc/2.5)}s at average pace</div>
+    </div>`;
+
+    // Bind events
+    document.querySelectorAll("[data-dur]").forEach(b=>b.onclick=()=>{
+      dur=parseInt(b.dataset.dur);left=dur;running=false;clearInterval(timerInterval);draw();
+    });
+
+    const sb=document.getElementById("startbtn");
+    if(sb)sb.onclick=()=>{left=dur;running=true;clearInterval(timerInterval);timerInterval=setInterval(()=>{left--;if(left<=0){clearInterval(timerInterval);running=false}draw()},1000);draw()};
+
+    const pb=document.getElementById("pausebtn");
+    if(pb)pb.onclick=()=>{running=false;clearInterval(timerInterval);draw()};
+
+    document.getElementById("resetbtn").onclick=()=>{running=false;left=dur;clearInterval(timerInterval);draw()};
+
+    const ta=document.getElementById("pitchta");
+    ta.oninput=()=>{pitchText=ta.value};
+
+    const gp=document.getElementById("genpitch");
+    if(gp)gp.onclick=async()=>{
+      showGen=true;genText="";draw();
+      genText=await callAI(`You are an expert PM interview coach. Based on this resume, write a compelling 2-minute elevator pitch for "Tell me about yourself" in a PM interview.\n\nResume:\n${profile}\n\nRequirements:\n- First person, natural conversational tone\n- Structure: Hook (15s) → Background (25s) → Highlight with metrics (30s) → Why This Role (20s) → Close (10s)\n- Include specific metrics from resume\n- Leave [this role / your company] as placeholders\n- ~250-300 words\n\nWrite the pitch:`);
+      draw();
+    };
+
+    const ud=document.getElementById("usedraft");
+    if(ud)ud.onclick=()=>{pitchText=genText;draw()};
+  }
+  draw();
+}
+
+// ═══════════════════════════════════════
+// Q&A PANEL
+// ═══════════════════════════════════════
+function renderQA(c,category){
+  const qs=QUESTIONS[category]||[];
+  const color=COLORS[category]||"#5B8DEF";
+  const tab=TABS.find(t=>t.id===category);
+  let openQ=-1;
+
+  function draw(){
+    c.innerHTML=`
+    <div class="hdr"><h1>${tab.icon} ${tab.label}</h1><p>Tap a question to practice</p></div>
+    ${profile?`<div class="green-badge">✓ Answers personalized to your resume</div>`:warnHTML()}
+    <div style="padding:0 16px 110px" id="qlist"></div>`;
+
+    const list=document.getElementById("qlist");
+    qs.forEach((q,i)=>{
+      // Question button
+      const qi=el("div","qi"+(openQ===i?" on":""));
+      qi.innerHTML=`<div class="qn" style="background:${color}">${i+1}</div><div class="qt">${q}</div>`;
+      qi.onclick=()=>{openQ=openQ===i?-1:i;draw()};
+      list.appendChild(qi);
+
+      // Answer panel
+      if(openQ===i){
+        const ap=el("div","ap");
+        ap.style.animation="fadeUp .3s ease both";
+        ap.innerHTML=`
+          <div style="font-size:11px;font-weight:800;color:var(--tx3);letter-spacing:.5px;margin-bottom:8px">YOUR ANSWER</div>
+          <textarea class="ta" id="userans" placeholder="Practice your answer... Use STAR: Situation → Task → Action → Result"></textarea>
+          <div style="margin-top:12px">
+            <button class="btn bp" style="font-size:12px;padding:8px 16px;border-radius:9px" id="genans">${profile?"✨ Personalized Answer":"✨ Sample Answer"}</button>
+          </div>
+          <div id="aibox"></div>`;
+        list.appendChild(ap);
+
+        document.getElementById("genans").onclick=async()=>{
+          const box=document.getElementById("aibox");
+          box.innerHTML=`<div style="margin-top:14px;padding:14px;border-radius:14px;background:rgba(240,98,80,.04);border:1px solid rgba(240,98,80,.12)">
+            <div style="font-size:10px;font-weight:800;color:${color};letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">${profile?"SAMPLE — FROM YOUR RESUME":"SAMPLE — GENERIC"}</div>
+            <div class="shimmer"></div></div>`;
+
+          const prompt=`You are a senior PM interview coach.${profile?` Candidate's resume:\n${profile}\n\nGenerate a PERSONALIZED sample answer referencing SPECIFIC experiences, metrics, and roles from their resume. First person.`:`\nGenerate a strong sample answer with realistic examples.`}\n\nUse STAR method for behavioral. Be specific with metrics. 200-300 words. Clear structure.\n\nCategory: ${tab.label}\nQuestion: ${q}\n\nWrite the answer:`;
+          const result=await callAI(prompt);
+
+          box.innerHTML=`<div style="margin-top:14px;padding:14px;border-radius:14px;background:rgba(240,98,80,.04);border:1px solid rgba(240,98,80,.12)">
+            <div style="font-size:10px;font-weight:800;color:${color};letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">${profile?"SAMPLE — FROM YOUR RESUME":"SAMPLE — GENERIC"}</div>
+            <div style="font-size:13px;color:var(--tx);line-height:1.85;white-space:pre-wrap">${result}</div></div>`;
+        };
+      }
+    });
+  }
+  draw();
+}
+
+// ═══════════════════════════════════════
+// MOCK INTERVIEW
+// ═══════════════════════════════════════
+function renderMock(c){
+  if(!mockState.step)mockState={step:"setup",cats:["behavioral","strategy"],num:3,qs:[],cur:0,answers:{},curAns:"",timer:0,fb:""};
+
+  function drawSetup(){
+    const cats=mockState.cats;const num=mockState.num;
+    c.innerHTML=`
+    <div class="hdr"><h1>🎯 Mock Interview</h1><p>Simulate a real PM interview panel</p></div>
+    <div style="padding:0 16px 110px">
+      ${profile?`<div class="green-badge">✓ Feedback personalized to your resume</div>`:warnHTML()}
+      <div style="font-size:12px;font-weight:800;color:var(--tx3);letter-spacing:.5px;margin-bottom:10px">CATEGORIES</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:24px" id="catpicks"></div>
+      <div style="font-size:12px;font-weight:800;color:var(--tx3);letter-spacing:.5px;margin-bottom:10px">NUMBER OF QUESTIONS</div>
+      <div style="display:flex;gap:8px;margin-bottom:28px" id="numpicks"></div>
+      <button class="btn bp" style="width:100%;padding:16px;font-size:16px" id="startmock" ${cats.length===0?"disabled":""}>🎯 Start Mock Interview</button>
+      <div style="color:var(--tx3);font-size:11px;text-align:center;margin-top:10px">Randomized · Timed · Honest panel-grade feedback</div>
+    </div>`;
+
+    const catBox=document.getElementById("catpicks");
+    ["behavioral","strategy","improve","design","metrics","execution"].forEach(cat=>{
+      const t=TABS.find(x=>x.id===cat);
+      const on=cats.includes(cat);
+      const b=el("button","chip"+(on?" on":""));
+      b.textContent=t.icon+" "+t.label;
+      if(on)b.style.cssText=`border-color:${COLORS[cat]};color:${COLORS[cat]};background:${COLORS[cat]}18`;
+      b.onclick=()=>{
+        if(cats.includes(cat))mockState.cats=cats.filter(x=>x!==cat);
+        else mockState.cats=[...cats,cat];
+        drawSetup();
+      };
+      catBox.appendChild(b);
+    });
+
+    const numBox=document.getElementById("numpicks");
+    [3,5,7].forEach(n=>{
+      const b=el("button","chip"+(num===n?" on":""));
+      b.textContent=n+" questions";
+      b.onclick=()=>{mockState.num=n;drawSetup()};
+      numBox.appendChild(b);
+    });
+
+    document.getElementById("startmock").onclick=()=>{
+      const pool=[];
+      mockState.cats.forEach(cat=>(QUESTIONS[cat]||[]).forEach(q=>pool.push({category:cat,question:q})));
+      mockState.qs=pool.sort(()=>Math.random()-.5).slice(0,mockState.num);
+      mockState.cur=0;mockState.answers={};mockState.curAns="";mockState.timer=0;mockState.fb="";
+      mockState.step="go";
+      timerInterval=setInterval(()=>mockState.timer++,1000);
+      drawInterview();
+    };
+  }
+
+  function drawInterview(){
+    const{qs,cur,curAns,timer}=mockState;
+    const q=qs[cur];const color=COLORS[q.category]||"#5B8DEF";const t=TABS.find(x=>x.id===q.category);
+
+    c.innerHTML=`
+    <div style="padding:16px 16px 8px;display:flex;justify-content:space-between;align-items:center">
+      <div style="font-size:12px;font-weight:700;color:var(--tx3)">Question ${cur+1} of ${qs.length}</div>
+      <div style="padding:5px 14px;background:var(--s1);border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700">⏱ ${fmt(timer)}</div>
+    </div>
+    <div style="padding:0 16px 6px"><div style="height:4px;background:var(--s2);border-radius:2px;overflow:hidden"><div style="height:4px;border-radius:2px;background:${color};width:${(cur/qs.length)*100}%;transition:width .4s"></div></div></div>
+    <div style="padding:10px 16px 110px">
+      <div class="chip on" style="border-color:${color};color:${color};background:${color}18;margin-bottom:14px">${t.icon} ${t.label}</div>
+      <h2 style="font-family:'Fraunces',serif;font-size:20px;line-height:1.45;margin-bottom:18px">${q.question}</h2>
+      <textarea class="ta" id="mockans" style="min-height:200px" placeholder="Type your answer... Be specific with examples and metrics.">${curAns}</textarea>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px">
+        <span style="color:var(--tx3);font-size:11px">${wordCount(curAns)} words</span>
+        <button class="btn bp" id="submitans">${cur<qs.length-1?"Next Question →":"Submit & Get Feedback"}</button>
+      </div>
+    </div>`;
+
+    const ta=document.getElementById("mockans");
+    ta.focus();
+    ta.oninput=()=>{mockState.curAns=ta.value};
+
+    document.getElementById("submitans").onclick=()=>{
+      mockState.answers[cur]=mockState.curAns;mockState.curAns="";
+      if(cur<qs.length-1){mockState.cur++;drawInterview()}
+      else{clearInterval(timerInterval);mockState.step="fb";drawFeedback()}
+    };
+  }
+
+  async function drawFeedback(){
+    const{qs,answers,timer}=mockState;
+
+    c.innerHTML=`
+    <div class="hdr"><h1>📋 Panel Debrief</h1><p>${fmt(timer)} · ${qs.length} questions</p></div>
+    <div style="padding:0 16px 110px">
+      <div class="card" style="text-align:center;padding:44px">
+        <div style="font-size:42px;margin-bottom:10px">🔍</div>
+        <div style="font-weight:700;font-size:15px">Interview panel deliberating...</div>
+        <div style="color:var(--tx3);font-size:12px;margin-top:4px">Analyzing against Senior PM hiring bar</div>
+        <div class="shimmer" style="margin-top:20px;height:8px"></div>
+      </div>
+    </div>`;
+
+    const qaT=qs.map((q,i)=>`Q${i+1} [${q.category}]: ${q.question}\nAnswer: ${answers[i]||"(No answer)"}`).join("\n\n");
+
+    const fb=await callAI(`You are a senior PM hiring manager at a top tech company. You just conducted a mock PM interview. Give honest, candid debrief feedback like a real panel. Do NOT sugarcoat.\n\n${profile?`Candidate's Resume:\n${profile}\n\n`:"No resume provided.\n\n"}Questions & Answers:\n${qaT}\n\nTime: ${fmt(timer)}\n\nProvide:\n1. OVERALL RATING: X/5 with verdict (Strong Hire / Hire / Lean Hire / Not Yet Ready)\n2. STRENGTHS — specific, reference their answers\n3. AREAS FOR IMPROVEMENT — honest, actionable\n4. PER-QUESTION: Score (Strong/Adequate/Weak) + what worked + what's missing${profile?" + experience from resume they should have used":""}\n5. COMMUNICATION STYLE feedback\n6. TOP 3 ACTION ITEMS\n\nBe direct and constructive.`);
+
+    mockState.fb=fb;
+
+    c.innerHTML=`
+    <div class="hdr"><h1>📋 Panel Debrief</h1><p>${fmt(timer)} · ${qs.length} questions</p></div>
+    <div style="padding:0 16px 110px">
+      <div class="card" style="white-space:pre-wrap;font-size:13px;line-height:1.85">${fb}</div>
+      <div style="font-size:12px;font-weight:800;color:var(--tx3);letter-spacing:.5px;margin:16px 0 10px">YOUR ANSWERS</div>
+      ${qs.map((q,i)=>`<div class="card" style="margin-bottom:8px">
+        <div style="font-size:10px;font-weight:800;color:${COLORS[q.category]||"#5B8DEF"};text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">${TABS.find(t=>t.id===q.category)?.icon||""} ${q.category}</div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:6px">${q.question}</div>
+        <div style="font-size:12px;color:var(--tx2);line-height:1.7;white-space:pre-wrap">${answers[i]||"(No answer)"}</div>
+      </div>`).join("")}
+      <button class="btn bp" style="width:100%;margin-top:10px" id="newmock">↺ Start New Mock Interview</button>
+    </div>`;
+
+    document.getElementById("newmock").onclick=()=>{mockState={step:"setup",cats:["behavioral","strategy"],num:3};renderMock(c)};
+  }
+
+  if(mockState.step==="setup")drawSetup();
+  else if(mockState.step==="go")drawInterview();
+  else if(mockState.step==="fb"&&mockState.fb){
+    // Re-render existing feedback
+    const{qs,answers,timer,fb}=mockState;
+    c.innerHTML=`
+    <div class="hdr"><h1>📋 Panel Debrief</h1><p>${fmt(timer)} · ${qs.length} questions</p></div>
+    <div style="padding:0 16px 110px">
+      <div class="card" style="white-space:pre-wrap;font-size:13px;line-height:1.85">${fb}</div>
+      <button class="btn bp" style="width:100%;margin-top:10px" id="newmock">↺ Start New Mock Interview</button>
+    </div>`;
+    document.getElementById("newmock").onclick=()=>{mockState={step:"setup",cats:["behavioral","strategy"],num:3};renderMock(c)};
+  }
+  else drawFeedback();
+}
+
+// ─── Init ───
+renderTabs();
+renderPage();
+</script>
+</body>
+</html>
