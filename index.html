@@ -3,322 +3,694 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"/>
-<title>Interactive PM Interview</title>
+<title>PM Interview</title>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="PM Interview"/>
-<meta name="mobile-web-app-capable" content="yes"/>
 <meta name="theme-color" content="#0B0B14"/>
-<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxODAgMTgwIj48cmVjdCB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgcng9IjQwIiBmaWxsPSIjMEIwQjE0Ii8+PHRleHQgeD0iOTAiIHk9IjExNSIgZm9udC1zaXplPSI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI0YwNjI1MCIgZm9udC1mYW1pbHk9InNlcmlmIiBmb250LXdlaWdodD0iYm9sZCI+UE08L3RleHQ+PC9zdmc+"/>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@400;700;800&family=Outfit:wght@300;400;500;600;700;800&display=swap');
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-:root{--bg:#0B0B14;--s1:#141424;--s2:#1C1C34;--tx:#EEEEF6;--tx2:#A0A0C0;--tx3:#606088;--accent:#F06250;--green:#3DD68C;--amber:#FBC94A;--st:env(safe-area-inset-top,0px);--sb:env(safe-area-inset-bottom,0px)}
+:root{--bg:#0B0B14;--s1:#141424;--s2:#1C1C34;--s3:#26264A;--tx:#EEEEF6;--tx2:#A0A0C0;--tx3:#606088;--red:#F06250;--green:#3DD68C;--amber:#FBC94A;--blue:#5B8DEF;--st:env(safe-area-inset-top,0px);--sb:env(safe-area-inset-bottom,0px)}
 html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--tx);font-family:'Outfit',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-::-webkit-scrollbar{width:0}
-textarea,input{font-family:inherit;-webkit-appearance:none;border:none}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--s3);border-radius:2px}
+*{box-sizing:border-box}
+textarea,input,button{font-family:inherit;-webkit-appearance:none;border:none}
 textarea:focus,input:focus{outline:none}
+button{cursor:pointer}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
 @keyframes spin{to{transform:rotate(360deg)}}
-.content{position:fixed;top:0;left:0;right:0;bottom:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-top:var(--st);padding-bottom:var(--sb)}
-.page{display:none;animation:fadeUp .3s ease both}
-.page.active{display:block}
-.hdr{padding:20px 16px 12px;background:linear-gradient(180deg,rgba(240,98,80,.08) 0%,transparent 100%)}
-.hdr h1{font-family:'Fraunces',serif;font-size:24px;font-weight:800;color:#fff}
-.hdr p{color:var(--tx3);font-size:12px;margin-top:3px}
-.card{background:var(--s1);border:1px solid rgba(255,255,255,.05);border-radius:14px;margin:0 12px 10px;padding:16px}
-.btn{padding:12px 24px;border:none;border-radius:12px;font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;transition:transform .12s;-webkit-appearance:none}
-.btn:active{transform:scale(.96)}
+@keyframes wave{0%,100%{height:6px}50%{height:20px}}
+
+/* ── LAYOUT ── */
+#app{position:fixed;inset:0;display:flex;flex-direction:column;padding-top:var(--st);padding-bottom:var(--sb)}
+.page{display:none;flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.page.on{display:block}
+
+/* ── COMMON ── */
+.card{background:var(--s1);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:16px;margin:0 14px 12px}
+.card-title{font-family:'Fraunces',serif;font-size:16px;font-weight:700;margin-bottom:10px}
+.btn{padding:12px 20px;border-radius:12px;font-weight:700;font-size:14px;transition:transform .1s,opacity .15s;border:none}
+.btn:active{transform:scale(.95);opacity:.85}
 .bp{background:linear-gradient(135deg,#F06250,#FF8A6E);color:#fff}
 .bs{background:var(--s2);color:var(--tx);border:1px solid rgba(255,255,255,.07)}
-.ta{width:100%;padding:12px;border-radius:12px;background:var(--s2);color:var(--tx);font-size:14px;line-height:1.6;resize:vertical;border:1.5px solid rgba(255,255,255,.07);max-height:100px;min-height:40px}
-.ta:focus{border-color:var(--accent)}
+.inp{width:100%;padding:12px 14px;border-radius:12px;background:var(--s2);color:var(--tx);font-size:14px;border:1.5px solid rgba(255,255,255,.07)}
+.inp:focus{border-color:var(--red)}
+.inp::placeholder{color:var(--tx3)}
+.ta{width:100%;padding:12px;border-radius:12px;background:var(--s2);color:var(--tx);font-size:13px;line-height:1.65;resize:vertical;border:1.5px solid rgba(255,255,255,.07)}
+.ta:focus{border-color:var(--red)}
 .ta::placeholder{color:var(--tx3)}
-.shimmer{background:linear-gradient(90deg,var(--s2) 25%,#26264A 50%,var(--s2) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:8px;height:40px}
-.toast{position:fixed;top:calc(16px + var(--st));left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:12px;background:var(--green);color:#0B0B14;font-size:12px;font-weight:700;z-index:1000}
-.bubble{margin:8px 12px;padding:12px 14px;border-radius:12px;line-height:1.6;font-size:13px;animation:fadeUp .3s ease;word-wrap:break-word}
-.bubble.user{background:var(--accent);color:#fff;margin-left:40px;text-align:right}
-.bubble.ai{background:var(--s2);color:var(--tx);margin-right:40px}
-.spinner{width:20px;height:20px;border:3px solid var(--tx3);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite;display:inline-block}
-.input-box{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(180deg,transparent,var(--bg));padding:12px 12px calc(12px + var(--sb));z-index:50}
+.badge-g{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:800;background:rgba(61,214,140,.1);border:1px solid rgba(61,214,140,.25);color:var(--green)}
+.badge-a{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:800;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);color:var(--amber)}
+.spinner{width:18px;height:18px;border:2.5px solid var(--s3);border-top-color:var(--red);border-radius:50%;animation:spin .6s linear infinite;display:inline-block}
+.toast-el{position:fixed;top:calc(14px + var(--st));left:50%;transform:translateX(-50%);padding:9px 20px;border-radius:12px;font-size:12px;font-weight:700;z-index:999;animation:fadeUp .25s ease}
+
+/* ── SETUP PAGE ── */
+.setup-body{padding:16px 0 80px}
+.hero{padding:20px 20px 14px}
+.hero h1{font-family:'Fraunces',serif;font-size:26px;font-weight:800;color:#fff}
+.hero h1 span{color:var(--red)}
+.hero p{color:var(--tx3);font-size:12px;margin-top:3px}
+
+/* Step badges */
+.step-num{width:26px;height:26px;border-radius:50%;background:var(--red);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-row{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px}
+
+/* API key highlight box */
+.key-box{background:linear-gradient(135deg,rgba(240,98,80,.08),rgba(240,98,80,.03));border:1px solid rgba(240,98,80,.25);border-radius:16px;padding:16px;margin:0 14px 12px}
+.key-title{font-family:'Fraunces',serif;font-size:16px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.key-status{font-size:11px;margin-top:8px;font-weight:600}
+
+/* Upload zone */
+.upzone{border:2px dashed rgba(255,255,255,.1);border-radius:12px;padding:22px;text-align:center;cursor:pointer;transition:all .2s;background:rgba(255,255,255,.02);margin-bottom:12px}
+.upzone.done{border-color:var(--green);border-style:solid;background:rgba(61,214,140,.04)}
+.upzone:active{border-color:var(--red)}
+
+/* Interview type grid */
+.type-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.type-btn{padding:14px;border-radius:14px;background:var(--s2);border:1.5px solid rgba(255,255,255,.06);text-align:center;cursor:pointer;transition:all .2s}
+.type-btn:hover,.type-btn:focus{border-color:rgba(240,98,80,.4);background:rgba(240,98,80,.07)}
+.type-btn:active{transform:scale(.96)}
+.type-btn .ic{font-size:26px;margin-bottom:4px}
+.type-btn .lbl{font-size:12px;font-weight:700}
+.type-btn .cnt{font-size:10px;color:var(--tx3);margin-top:3px}
+
+/* ── INTERVIEW PAGE ── */
+#ivPage{display:flex;flex-direction:column;height:100%}
+.iv-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.05);flex-shrink:0}
+.iv-title{font-family:'Fraunces',serif;font-size:16px;font-weight:700}
+.iv-sub{font-size:10px;color:var(--tx3);margin-top:2px}
+.iv-controls{display:flex;gap:6px}
+.ctrl-btn{padding:5px 11px;border-radius:8px;background:var(--s2);color:var(--tx2);font-size:11px;font-weight:600;border:1px solid rgba(255,255,255,.06);cursor:pointer;transition:all .2s}
+.ctrl-btn.on{background:rgba(240,98,80,.12);color:var(--red);border-color:rgba(240,98,80,.25)}
+.ctrl-btn.end{color:var(--red)}
+
+/* Progress */
+.prog{height:3px;background:var(--s2);flex-shrink:0}
+.prog-fill{height:3px;background:linear-gradient(90deg,var(--red),var(--amber));transition:width .5s;border-radius:2px;width:0%}
+
+/* Split body */
+.iv-body{display:flex;flex:1;min-height:0;overflow:hidden}
+
+/* Chat */
+.chat-col{display:flex;flex-direction:column;flex:1;min-width:0;overflow:hidden}
+.msgs{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px;display:flex;flex-direction:column;gap:2px}
+.lbl{font-size:9px;font-weight:800;color:var(--tx3);text-transform:uppercase;letter-spacing:.5px;padding:0 4px;margin-top:8px}
+.lbl.r{text-align:right}
+.bubble{padding:11px 14px;border-radius:14px;font-size:13px;line-height:1.7;word-wrap:break-word;animation:fadeUp .25s ease;max-width:88%}
+.bubble.ai{background:var(--s2);color:var(--tx);border:1px solid rgba(255,255,255,.05);align-self:flex-start}
+.bubble.user{background:linear-gradient(135deg,#F06250,#FF8A6E);color:#fff;align-self:flex-end}
+.bubble.sys{background:rgba(91,141,239,.08);border:1px solid rgba(91,141,239,.15);color:var(--blue);font-size:11px;font-weight:600;align-self:center;border-radius:8px;padding:6px 14px;text-align:center;max-width:100%}
+.thinking-dots{display:flex;gap:4px;align-items:center;padding:4px 0}
+.thinking-dots span{width:6px;height:6px;border-radius:50%;background:var(--tx3);animation:wave .8s ease infinite}
+.thinking-dots span:nth-child(2){animation-delay:.15s}
+.thinking-dots span:nth-child(3){animation-delay:.3s}
+
+/* Input */
+.input-area{padding:10px 12px calc(10px + var(--sb));border-top:1px solid rgba(255,255,255,.05);flex-shrink:0;background:var(--bg)}
+.rec-indicator{display:none;align-items:center;gap:8px;padding:0 0 8px}
+.rec-indicator.on{display:flex}
+.mic-wave{display:flex;gap:3px;align-items:center}
+.mic-wave span{width:3px;border-radius:2px;background:var(--red);animation:wave .5s ease infinite}
+.mic-wave span:nth-child(2){animation-delay:.1s}
+.mic-wave span:nth-child(3){animation-delay:.2s}
+.mic-wave span:nth-child(4){animation-delay:.3s}
 .input-row{display:flex;gap:8px;align-items:flex-end}
-.input-ta{flex:1;padding:10px 12px;border-radius:10px;background:var(--s1);border:1.5px solid rgba(255,255,255,.08);color:var(--tx);font-size:13px;resize:none;max-height:100px;min-height:40px}
-.send-btn{padding:10px 12px;background:var(--accent);border:none;border-radius:10px;color:#fff;font-weight:700;cursor:pointer;height:40px;min-width:40px;display:flex;align-items:center;justify-content:center}
-.msgs-area{padding-bottom:120px}
+.chat-input{flex:1;min-height:42px;max-height:90px;padding:10px 12px;border-radius:11px;background:var(--s1);border:1.5px solid rgba(255,255,255,.07);color:var(--tx);font-size:13px;resize:none;line-height:1.5}
+.chat-input:focus{border-color:var(--red)}
+.chat-input::placeholder{color:var(--tx3)}
+.mic-btn{width:42px;height:42px;border-radius:11px;background:var(--s2);color:var(--tx2);font-size:18px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.07);flex-shrink:0;transition:all .2s}
+.mic-btn.rec{background:rgba(240,98,80,.15);border-color:var(--red);color:var(--red)}
+.send-btn{width:42px;height:42px;border-radius:11px;background:var(--red);color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hint{font-size:10px;color:var(--tx3);text-align:center;margin-top:6px}
+
+/* Notes panel */
+.notes-col{width:0;overflow:hidden;transition:width .3s ease;flex-shrink:0;display:flex;flex-direction:column;border-left:1px solid transparent}
+.notes-col.on{width:45%;border-left-color:rgba(255,255,255,.05)}
+@media(max-width:640px){.notes-col.on{position:fixed;inset:0;width:100%;z-index:100;background:var(--bg);display:flex;flex-direction:column}}
+.notes-header{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.05);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.notes-header h4{font-size:13px;font-weight:700;color:var(--tx2)}
+.notes-tabs{display:flex;gap:5px}
+.ntab{padding:4px 10px;border-radius:7px;font-size:11px;font-weight:700;background:var(--s2);color:var(--tx3);cursor:pointer;transition:all .2s;border:none}
+.ntab.on{background:var(--red);color:#fff}
+.notes-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:10px;display:flex;flex-direction:column}
+.notes-ta{flex:1;width:100%;background:var(--s2);border:1.5px solid rgba(255,255,255,.07);border-radius:12px;padding:12px;color:var(--tx);font-size:13px;line-height:1.7;resize:none;min-height:300px}
+.notes-ta:focus{border-color:var(--red);outline:none}
+.notes-ta::placeholder{color:var(--tx3)}
+
+/* Canvas */
+.canvas-tools{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;align-items:center}
+.tool-btn{padding:5px 10px;border-radius:8px;font-size:11px;font-weight:700;background:var(--s2);color:var(--tx2);border:1px solid rgba(255,255,255,.07);cursor:pointer;transition:all .2s}
+.tool-btn.on{background:var(--red);color:#fff;border-color:var(--red)}
+.clr-dot{width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:border-color .15s;flex-shrink:0}
+.clr-dot.on{border-color:#fff}
+.canvas-wrap{flex:1;border-radius:12px;overflow:hidden;background:var(--s2);position:relative;min-height:200px}
+#wbCanvas{width:100%;height:100%;display:block;touch-action:none}
 </style>
 </head>
 <body>
-<div class="content" id="content"></div>
-<div class="toast" id="toast" style="display:none"></div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<div id="app">
+
+<!-- ══════════════════════════════
+     SETUP PAGE
+══════════════════════════════ -->
+<div class="page on" id="setupPage">
+<div class="setup-body">
+
+  <div class="hero">
+    <h1>PM <span>Interview</span></h1>
+    <p>Interactive · Conversational · Live feedback</p>
+  </div>
+
+  <!-- STEP 1 — API KEY -->
+  <div class="key-box" id="keyBox">
+    <div class="key-title">🔑 Step 1 — Paste Your API Key</div>
+    <p style="color:var(--tx2);font-size:12px;line-height:1.6;margin-bottom:10px">
+      Get your free key at <strong>console.anthropic.com</strong> → API Keys → Create Key. Paste it below. It's saved on your device only.
+    </p>
+    <input class="inp" type="password" id="apiKeyInput" placeholder="sk-ant-api03-...  ← paste here"/>
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="btn bp" style="flex:1" onclick="saveKey()">✓ Save Key</button>
+      <button class="btn bs" onclick="window.open('https://console.anthropic.com','_blank')">Get Key ↗</button>
+    </div>
+    <div id="keyStatus" class="key-status" style="color:var(--tx3)">No key saved yet</div>
+  </div>
+
+  <!-- STEP 2 — RESUME -->
+  <div class="card">
+    <div class="card-title">📄 Step 2 — Upload Resume <span id="resumeBadge"></span></div>
+    <p style="color:var(--tx2);font-size:12px;line-height:1.6;margin-bottom:12px">The AI interviewer uses your resume to ask personalized questions and give relevant feedback.</p>
+    <input type="file" id="fileIn" accept=".pdf,.txt" style="display:none"/>
+    <div class="upzone" id="upzone" onclick="document.getElementById('fileIn').click()">
+      <div id="upStatus">
+        <div style="font-size:32px;margin-bottom:6px">📄</div>
+        <div style="font-size:13px;font-weight:600">Tap to upload PDF or TXT</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <div style="flex:1;height:1px;background:rgba(255,255,255,.07)"></div>
+      <div style="font-size:10px;font-weight:700;color:var(--tx3)">OR PASTE TEXT</div>
+      <div style="flex:1;height:1px;background:rgba(255,255,255,.07)"></div>
+    </div>
+    <textarea class="ta" id="profileTa" rows="5" placeholder="Paste your resume or experience summary here..."></textarea>
+    <button class="btn bs" style="width:100%;margin-top:10px" onclick="saveResume()">💾 Save Resume</button>
+  </div>
+
+  <!-- STEP 3 — START -->
+  <div class="card" id="startCard">
+    <div class="card-title">🎯 Step 3 — Choose Interview Type</div>
+    <p style="color:var(--tx2);font-size:12px;margin-bottom:12px;line-height:1.6">The AI will conduct a real back-and-forth interview, give feedback on each answer, and rate you at the end.</p>
+    <div class="type-grid">
+      <button class="type-btn" onclick="go('behavioral',3)"><div class="ic">🧠</div><div class="lbl">Behavioral</div><div class="cnt">3 questions</div></button>
+      <button class="type-btn" onclick="go('strategy',3)"><div class="ic">♟️</div><div class="lbl">Strategy</div><div class="cnt">3 questions</div></button>
+      <button class="type-btn" onclick="go('design',3)"><div class="ic">📱</div><div class="lbl">Product Design</div><div class="cnt">3 questions</div></button>
+      <button class="type-btn" onclick="go('execution',3)"><div class="ic">⚙️</div><div class="lbl">Execution</div><div class="cnt">3 questions</div></button>
+      <button class="type-btn" onclick="go('metrics',3)"><div class="ic">📊</div><div class="lbl">Metrics</div><div class="cnt">3 questions</div></button>
+      <button class="type-btn" onclick="go('mixed',5)"><div class="ic">🎯</div><div class="lbl">Full Loop</div><div class="cnt">5 questions</div></button>
+    </div>
+  </div>
+
+  <div style="margin:0 14px;padding:12px 14px;background:rgba(91,141,239,.06);border:1px solid rgba(91,141,239,.12);border-radius:12px;font-size:12px;color:var(--tx2);line-height:1.7">
+    💡 <strong>How it works:</strong> The AI asks one question at a time. You answer by typing or speaking. It gives you immediate feedback, then continues — just like a real PM interview panel.
+  </div>
+</div>
+</div>
+
+<!-- ══════════════════════════════
+     INTERVIEW PAGE
+══════════════════════════════ -->
+<div id="ivPage" class="page" style="display:flex;flex-direction:column;height:100%">
+  <!-- Header -->
+  <div class="iv-header">
+    <div>
+      <div class="iv-title" id="ivTitle">🎙️ Interview</div>
+      <div class="iv-sub" id="ivSub">Loading...</div>
+    </div>
+    <div class="iv-controls">
+      <button class="ctrl-btn on" id="voiceBtn" onclick="toggleVoice()">🔊 Voice</button>
+      <button class="ctrl-btn" id="notesBtn" onclick="toggleNotes()">📝 Notes</button>
+      <button class="ctrl-btn end" onclick="endInterview()">✕ End</button>
+    </div>
+  </div>
+  <div class="prog"><div class="prog-fill" id="progFill"></div></div>
+
+  <!-- Body -->
+  <div class="iv-body">
+    <!-- Chat -->
+    <div class="chat-col">
+      <div class="msgs" id="msgs"></div>
+      <div class="input-area">
+        <div class="rec-indicator" id="recBar">
+          <div class="mic-wave"><span></span><span></span><span></span><span></span></div>
+          <span style="font-size:12px;color:var(--red);font-weight:600">Listening...</span>
+          <button onclick="stopRec()" style="margin-left:auto;padding:4px 10px;border-radius:7px;background:var(--red);color:#fff;font-size:11px;font-weight:700">Stop</button>
+        </div>
+        <div class="input-row">
+          <button class="mic-btn" id="micBtn" onclick="toggleMic()">🎤</button>
+          <textarea class="chat-input" id="chatInput" placeholder="Type your answer..." rows="1"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send()}"></textarea>
+          <button class="send-btn" onclick="send()">↑</button>
+        </div>
+        <div class="hint">Enter to send · Shift+Enter for new line · 🎤 for voice</div>
+      </div>
+    </div>
+
+    <!-- Notes & Whiteboard -->
+    <div class="notes-col" id="notesCol">
+      <div class="notes-header">
+        <h4>📝 Notes</h4>
+        <div style="display:flex;gap:6px;align-items:center">
+          <div class="notes-tabs">
+            <button class="ntab on" id="tab-notes" onclick="switchTab('notes')">Notes</button>
+            <button class="ntab" id="tab-draw" onclick="switchTab('draw')">Whiteboard</button>
+          </div>
+          <button class="ctrl-btn" onclick="toggleNotes()">✕</button>
+        </div>
+      </div>
+      <div class="notes-body">
+        <!-- Notes tab -->
+        <div id="notesTab" style="display:flex;flex-direction:column;flex:1;gap:8px">
+          <textarea class="notes-ta" id="notesArea"
+            placeholder="Jot notes here during the interview:&#10;• Key metrics to mention&#10;• STAR method structure&#10;• Frameworks to use&#10;• Follow-up ideas..."></textarea>
+          <button class="btn bs" style="font-size:11px;padding:7px 12px;border-radius:9px" onclick="document.getElementById('notesArea').value=''">🗑️ Clear</button>
+        </div>
+        <!-- Whiteboard tab -->
+        <div id="drawTab" style="display:none;flex-direction:column;flex:1;gap:8px">
+          <div class="canvas-tools">
+            <button class="tool-btn on" id="penBtn" onclick="setTool('pen',this)">✏️ Pen</button>
+            <button class="tool-btn" id="erBtn" onclick="setTool('eraser',this)">⬜ Erase</button>
+            <div style="display:flex;gap:5px;margin-left:4px">
+              <div class="clr-dot on" style="background:#EEF" onclick="setClr('#EEF',this)"></div>
+              <div class="clr-dot" style="background:#F06250" onclick="setClr('#F06250',this)"></div>
+              <div class="clr-dot" style="background:#3DD68C" onclick="setClr('#3DD68C',this)"></div>
+              <div class="clr-dot" style="background:#FBC94A" onclick="setClr('#FBC94A',this)"></div>
+              <div class="clr-dot" style="background:#5B8DEF" onclick="setClr('#5B8DEF',this)"></div>
+            </div>
+            <button class="tool-btn" style="margin-left:auto" onclick="clearCanvas()">🗑️</button>
+          </div>
+          <div class="canvas-wrap" id="canvasWrap">
+            <canvas id="wbCanvas"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- #app -->
+<div class="toast-el" id="toast" style="display:none"></div>
+
 <script>
-// ─── STATE ───
-let state={
-  page:"setup",profile:"",fileName:"",
-  interviewType:"",messages:[],questionCount:0,maxQuestions:0
-};
+// ════════════════════════════════
+// STATE
+// ════════════════════════════════
+let apiKey="",profile="",fileName="";
+let messages=[],qCount=0,maxQ=0,iType="";
+let voiceOn=true,notesOpen=false,curTab="notes";
+let isRec=false,recognition=null,synth=window.speechSynthesis;
+let drawTool="pen",drawClr="#EEF",drawing=false,lx=0,ly=0,ctx=null;
 
-try{
-  state.profile=localStorage.getItem("pm_profile")||"";
-  state.fileName=localStorage.getItem("pm_filename")||"";
-}catch(e){}
-
-function save(){try{localStorage.setItem("pm_profile",state.profile);localStorage.setItem("pm_filename",state.fileName)}catch(e){}}
-function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.style.display="block";setTimeout(()=>t.style.display="none",2500)}
-
-// ─── AI CALL ───
-async function callAI(userMsg){
+// Load saved data
+(()=>{
   try{
-    const r=await fetch("https://api.anthropic.com/v1/messages",{
-      method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({
-        model:"claude-sonnet-4-20250514",max_tokens:400,
-        system:`You are an expert PM interviewer at a FAANG company. You conduct conversational, challenging interviews.
-${state.profile?`Candidate background:\n${state.profile}\n`:""}
-INTERVIEW STYLE:
-- Ask ONE focused question at a time, natural tone
-- LISTEN to their answer carefully
-- Give IMMEDIATE feedback: 1 sentence on what was strong, 1 sentence on what was weak/missing
-- Ask a follow-up if needed for clarity
-- After ${state.maxQuestions} questions, summarize with a rating (Strong Hire / Hire / Lean Hire / Not Yet Ready)
-- Reference their specific experience when you can
-- Challenge them - don't be easy
+    apiKey=localStorage.getItem("pm_key")||"";
+    profile=localStorage.getItem("pm_profile")||"";
+    fileName=localStorage.getItem("pm_fname")||"";
+  }catch(e){}
+  if(apiKey){
+    document.getElementById("apiKeyInput").value=apiKey;
+    setKeyStatus(true);
+  }
+  if(profile){
+    document.getElementById("profileTa").value=profile;
+    document.getElementById("resumeBadge").innerHTML=`<span class="badge-g">✓ Loaded</span>`;
+    document.getElementById("upzone").classList.add("done");
+    document.getElementById("upStatus").innerHTML=`<div style="color:var(--green);font-weight:700;font-size:13px">✓ ${fileName||"Resume loaded"}</div>`;
+  }
+  initCanvas();
+  initSpeech();
+})();
 
-Keep responses concise (2-3 sentences max per turn). Be the real interviewer they need.`,
-        messages:state.messages.map(m=>({role:m.role,content:m.content}))
-      })
-    });
-    const d=await r.json();
-    return d.content?.[0]?.text||"Error. Try again.";
-  }catch(e){return "Connection error. Check internet."}
+// ── TOAST ──
+function toast(msg,color){
+  const t=document.getElementById("toast");
+  t.textContent=msg;t.style.background=color||"var(--green)";t.style.color=color?"#fff":"#0B0B14";
+  t.style.display="block";setTimeout(()=>t.style.display="none",2500);
 }
 
-// ─── PDF EXTRACTION ───
-async function extractPDF(file){
-  return new Promise((resolve,reject)=>{
-    const script=document.createElement("script");
-    script.src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
-    script.onload=async()=>{
+// ── API KEY ──
+function saveKey(){
+  const v=document.getElementById("apiKeyInput").value.trim();
+  if(!v){toast("Paste your API key first","var(--amber)");return}
+  if(!v.startsWith("sk-")){toast("Key must start with sk-","var(--red)");return}
+  apiKey=v;try{localStorage.setItem("pm_key",apiKey)}catch(e){}
+  setKeyStatus(true);toast("✓ API key saved!");
+}
+
+function setKeyStatus(ok){
+  const s=document.getElementById("keyStatus");
+  const box=document.getElementById("keyBox");
+  if(ok){
+    s.textContent="✓ Key saved — you're ready to go";
+    s.style.color="var(--green)";
+    box.style.borderColor="rgba(61,214,140,.3)";
+    box.style.background="rgba(61,214,140,.04)";
+  }else{
+    s.textContent="No key saved yet";
+    s.style.color="var(--tx3)";
+  }
+}
+
+// ── RESUME ──
+document.getElementById("fileIn").onchange=async(e)=>{
+  const f=e.target.files?.[0];if(!f)return;
+  document.getElementById("upStatus").innerHTML=`<div class="spinner"></div><div style="font-size:12px;color:var(--tx2);margin-top:6px">Reading...</div>`;
+  try{
+    let text="";
+    if(f.name.toLowerCase().endsWith(".pdf"))text=await readPDF(f);
+    else text=await f.text();
+    profile=text;fileName=f.name;
+    document.getElementById("profileTa").value=profile;
+    saveResume();
+    document.getElementById("upzone").classList.add("done");
+    document.getElementById("upStatus").innerHTML=`<div style="color:var(--green);font-weight:700;font-size:13px">✓ ${f.name}</div>`;
+    toast("✓ Resume uploaded!");
+  }catch(err){
+    toast("Error reading file","var(--red)");
+    document.getElementById("upStatus").innerHTML=`<div style="font-size:32px;margin-bottom:6px">📄</div><div style="font-size:13px;font-weight:600">Tap to upload PDF or TXT</div>`;
+  }
+};
+
+async function readPDF(file){
+  return new Promise((res,rej)=>{
+    let s=document.createElement("script");
+    s.src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
+    s.onload=async()=>{
       try{
         pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
         const buf=await file.arrayBuffer();
         const pdf=await pdfjsLib.getDocument({data:buf}).promise;
         let text="";
-        for(let i=1;i<=Math.min(pdf.numPages,2);i++){
+        for(let i=1;i<=Math.min(pdf.numPages,3);i++){
           const pg=await pdf.getPage(i);
-          const c=await pg.getTextContent();
-          text+=c.items.map(x=>x.str).join(" ")+"\n";
+          const ct=await pg.getTextContent();
+          text+=ct.items.map(x=>x.str).join(" ")+"\n";
         }
-        resolve(text.trim());
-      }catch(e){reject(e)}
+        res(text.trim());
+      }catch(e){rej(e)}
     };
-    script.onerror=()=>reject(new Error("PDF load failed"));
-    document.head.appendChild(script);
+    s.onerror=()=>rej(new Error("PDF failed"));
+    document.head.appendChild(s);
   });
 }
 
-// ─── RENDER ───
-function render(){
-  const c=document.getElementById("content");
-  c.scrollTop=0;
-  if(state.page==="setup")renderSetup(c);
-  else if(state.page==="profile")renderProfile(c);
-  else if(state.page==="interview")renderInterview(c);
+function saveResume(){
+  profile=document.getElementById("profileTa").value.trim();
+  try{localStorage.setItem("pm_profile",profile);localStorage.setItem("pm_fname",fileName)}catch(e){}
+  document.getElementById("resumeBadge").innerHTML=profile?`<span class="badge-g">✓ Loaded</span>`:"";
+  toast("✓ Resume saved!");
 }
 
-function renderSetup(c){
-  c.innerHTML=`
-  <div class="page active">
-    <div class="hdr"><h1>🎯 Interactive PM Interview</h1><p>Conversational interview with live feedback</p></div>
-    <div style="padding:16px 12px 100px">
-      <div class="card">
-        <h2 style="font-family:'Fraunces',serif;font-size:18px;margin-bottom:12px">Start interviewing</h2>
-        <div style="color:var(--tx2);font-size:13px;line-height:1.7;margin-bottom:16px">
-          ${state.profile
-            ?`<div style="color:var(--green);font-weight:700;margin-bottom:8px">✓ Resume loaded (${state.profile.split(/\s+/).length} words)</div>You'll be interviewed conversationally. AI will ask questions, listen to your answers, and give real-time feedback.`
-            :`<strong>First:</strong> Upload your resume for personalized interviewing based on your background.`}
-        </div>
-        <button class="btn bp" style="width:100%;margin-bottom:10px" onclick="state.page='profile';render()">
-          ${state.profile?"Change Resume":"Upload Resume"}
-        </button>
-        ${state.profile?`
-        <div style="font-size:12px;color:var(--tx3);margin:16px 0">Interview type:</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
-          <button class="card" style="padding:14px;text-align:center;cursor:pointer;border:1px solid rgba(240,98,80,.2);transition:all .2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='rgba(240,98,80,.2)'" onclick="start('behavioral')">
-            <div style="font-size:28px;margin-bottom:4px">🧠</div>
-            <div style="font-size:12px;font-weight:700">Behavioral</div>
-            <div style="font-size:10px;color:var(--tx3);margin-top:4px">3 questions</div>
-          </button>
-          <button class="card" style="padding:14px;text-align:center;cursor:pointer;border:1px solid rgba(240,98,80,.2);transition:all .2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='rgba(240,98,80,.2)'" onclick="start('strategy')">
-            <div style="font-size:28px;margin-bottom:4px">♟️</div>
-            <div style="font-size:12px;font-weight:700">Strategy</div>
-            <div style="font-size:10px;color:var(--tx3);margin-top:4px">3 questions</div>
-          </button>
-          <button class="card" style="padding:14px;text-align:center;cursor:pointer;border:1px solid rgba(240,98,80,.2);transition:all .2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='rgba(240,98,80,.2)'" onclick="start('mixed')">
-            <div style="font-size:28px;margin-bottom:4px">🎯</div>
-            <div style="font-size:12px;font-weight:700">Mixed</div>
-            <div style="font-size:10px;color:var(--tx3);margin-top:4px">5 questions</div>
-          </button>
-          <button class="card" style="padding:14px;text-align:center;cursor:pointer;border:1px solid rgba(240,98,80,.2);transition:all .2s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='rgba(240,98,80,.2)'" onclick="state.page='practice';render()">
-            <div style="font-size:28px;margin-bottom:4px">📚</div>
-            <div style="font-size:12px;font-weight:700">Q Library</div>
-            <div style="font-size:10px;color:var(--tx3);margin-top:4px">Practice</div>
-          </button>
-        </div>
-        <div style="font-size:11px;color:var(--tx3);padding:12px;background:rgba(255,255,255,.02);border-radius:10px">
-          💡 The AI interviewer will ask follow-up questions based on your answers. Answer naturally - don't worry about perfect structure.
-        </div>
-        `:""}
-      </div>
-    </div>
-  </div>`;
-}
+// ── AI CALL ──
+async function callAI(){
+  if(!apiKey){toast("Paste your API key in Step 1","var(--amber)");return null}
+  try{
+    const r=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "x-api-key":apiKey,
+        "anthropic-version":"2023-06-01",
+        "anthropic-dangerous-direct-browser-access":"true"
+      },
+      body:JSON.stringify({
+        model:"claude-sonnet-4-20250514",
+        max_tokens:350,
+        system:`You are a senior PM interviewer at a top tech company (Google/Meta/Amazon). You conduct sharp, realistic PM interviews.
 
-function renderProfile(c){
-  c.innerHTML=`
-  <div class="page active">
-    <div class="hdr"><h1>👤 Your Resume</h1><p>Upload for personalized interview</p></div>
-    <div style="padding:16px 12px 100px">
-      <div class="card">
-        <input type="file" accept=".pdf,.txt" id="filein" style="display:none"/>
-        <div id="upzone" style="border:2px dashed rgba(255,255,255,.15);border-radius:16px;padding:32px 20px;text-align:center;cursor:pointer;background:rgba(255,255,255,.02);margin-bottom:16px" onclick="document.getElementById('filein').click()">
-          <div id="upstatus">
-            ${state.profile
-              ?`<div style="font-size:36px;margin-bottom:8px">✅</div><div style="color:var(--green);font-weight:700">Loaded</div><div style="color:var(--tx2);font-size:11px;margin-top:4px">${state.fileName||"Pasted text"}</div>`
-              :`<div style="font-size:36px;margin-bottom:8px">📄</div><div style="font-weight:700;margin-bottom:4px">Upload Your Resume</div><div style="color:var(--tx2);font-size:12px">PDF or text file</div>`}
-          </div>
-        </div>
-        <textarea class="ta" id="profta" style="min-height:220px;max-height:none" placeholder="Or paste your resume/experience here...">${state.profile}</textarea>
-        <div style="display:flex;gap:8px;margin-top:12px">
-          <button class="btn bp" style="flex:1" onclick="savePro()">💾 Save</button>
-          <button class="btn bs" onclick="state.page='setup';render()">← Back</button>
-        </div>
-      </div>
-    </div>
-  </div>`;
-
-  document.getElementById("filein").onchange=async(e)=>{
-    const f=e.target.files?.[0];if(!f)return;
-    document.getElementById("upstatus").innerHTML=`<div class="spinner"></div><div style="color:var(--tx2);margin-top:8px;font-size:12px">Reading...</div>`;
-    try{
-      if(f.name.toLowerCase().endsWith(".pdf"))state.profile=await extractPDF(f);
-      else state.profile=await f.text();
-      state.fileName=f.name;save();toast("✓ Uploaded!");renderProfile(c);
-    }catch(e){toast("Error reading file");renderProfile(c)}
-  };
-  document.getElementById("profta").oninput=(e)=>{state.profile=e.target.value;state.fileName=""};
-}
-
-function renderInterview(c){
-  c.innerHTML=`
-  <div class="page active" style="padding-bottom:140px;min-height:100vh">
-    <div style="padding:16px 12px 0;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-      <h2 style="font-family:'Fraunces',serif;font-size:18px">🎙️ Interview</h2>
-      <button class="bs" style="padding:6px 12px;font-size:12px;border-radius:8px" onclick="endInterview()">End</button>
-    </div>
-    <div class="msgs-area" id="msgs"></div>
-  </div>
-  <div class="input-box">
-    <div class="input-row">
-      <textarea class="input-ta" id="userin" placeholder="Type your answer..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send()}"></textarea>
-      <button class="send-btn" onclick="send()">→</button>
-    </div>
-  </div>`;
-
-  const msgBox=document.getElementById("msgs");
-  state.messages.forEach(m=>{
-    const b=document.createElement("div");
-    b.className="bubble"+(m.role==="user"?" user":" ai");
-    b.textContent=m.content;
-    msgBox.appendChild(b);
-  });
-
-  setTimeout(()=>{msgBox.parentElement.scrollTop=msgBox.parentElement.scrollHeight},100);
-
-  const inp=document.getElementById("userin");
-  inp.focus();
-}
-
-async function send(){
-  const inp=document.getElementById("userin");
-  const ans=inp.value.trim();
-  if(!ans)return;
-
-  state.messages.push({role:"user",content:ans});
-  inp.value="";
-
-  const msgBox=document.getElementById("msgs");
-  const b1=document.createElement("div");
-  b1.className="bubble user";
-  b1.textContent=ans;
-  msgBox.appendChild(b1);
-
-  const b2=document.createElement("div");
-  b2.className="bubble ai";
-  b2.innerHTML=`<div class="spinner"></div>`;
-  msgBox.appendChild(b2);
-
-  msgBox.parentElement.scrollTop=msgBox.parentElement.scrollHeight;
-
-  const response=await callAI(ans);
-  state.messages.push({role:"assistant",content:response});
-  state.questionCount++;
-
-  b2.textContent=response;
-  msgBox.parentElement.scrollTop=msgBox.parentElement.scrollHeight;
-
-  if(state.questionCount>=state.maxQuestions){
-    setTimeout(()=>{
-      const b3=document.createElement("div");
-      b3.className="bubble ai";
-      b3.innerHTML=`<strong>Interview Complete</strong><br><br>Tap "End" to review or start a new interview.`;
-      msgBox.appendChild(b3);
-      msgBox.parentElement.scrollTop=msgBox.parentElement.scrollHeight;
-    },1000);
+${profile?`CANDIDATE BACKGROUND:\n${profile}\n\n`:""}INTERVIEW RULES:
+- Ask exactly ONE question per turn
+- Give DIRECT feedback on the previous answer in 1-2 sentences (strength + gap)
+- Ask a targeted follow-up if answer lacked specificity or metrics
+- Challenge weak answers — ask "what metrics?", "how did you measure that?", "why that approach?"
+- Reference their actual background from the resume when relevant
+- After ${maxQ} questions answered: give FINAL DEBRIEF with rating (Strong Hire / Hire / Lean Hire / Not Yet Ready), top 2 strengths, top 2 improvements
+- Be concise — maximum 3 sentences per turn`,
+        messages:messages
+      })
+    });
+    if(!r.ok){
+      const err=await r.json().catch(()=>({}));
+      const msg=err.error?.message||"API error";
+      if(msg.includes("auth")||msg.includes("key"))toast("Invalid API key — check console.anthropic.com","var(--red)");
+      else toast("Error: "+msg,"var(--red)");
+      return null;
+    }
+    const d=await r.json();
+    return d.content?.[0]?.text||null;
+  }catch(e){
+    toast("Connection error — check your internet","var(--red)");return null;
   }
-
-  inp.focus();
 }
 
-async function start(type){
-  state.interviewType=type;
-  state.maxQuestions=type==="mixed"?5:3;
-  state.questionCount=0;
-  state.messages=[];
-  state.page="interview";
+// ── START INTERVIEW ──
+const OPENERS={
+  behavioral:"You are starting a behavioral PM interview. Greet the candidate warmly and ask a strong behavioral question about handling a real conflict or setback.",
+  strategy:"You are starting a product strategy interview. Briefly introduce yourself and ask a strategy question about market positioning or product vision.",
+  design:"You are starting a product design interview. Introduce yourself and ask them to walk through how they'd design or improve a specific product.",
+  execution:"You are starting a PM execution interview. Introduce yourself and ask about how they handle prioritization, trade-offs, or shipping under pressure.",
+  metrics:"You are starting a PM metrics interview. Introduce yourself and ask how they've defined and measured product success in a past role.",
+  mixed:"You are starting a comprehensive PM interview loop. Greet the candidate and start with a strong behavioral question to warm up."
+};
+const LABELS={behavioral:"🧠 Behavioral",strategy:"♟️ Strategy",design:"📱 Product Design",execution:"⚙️ Execution",metrics:"📊 Metrics",mixed:"🎯 Full Loop"};
 
-  const prompts={
-    behavioral:"Start a PM interview. Ask your first behavioral question about a real challenge or conflict they faced. Make it specific to their role.",
-    strategy:"Start a PM interview. Ask your first strategy question - something about product vision, roadmap, or company direction.",
-    mixed:"Start a comprehensive PM interview. Ask your first question - could be behavioral or strategic."
-  };
+async function go(type,num){
+  if(!apiKey){toast("Save your API key first (Step 1)","var(--amber)");return}
+  if(!profile){toast("Upload your resume first (Step 2)","var(--amber)");return}
 
-  state.messages.push({role:"user",content:prompts[type]});
-  const resp=await callAI(prompts[type]);
-  state.messages.push({role:"assistant",content:resp});
-  state.questionCount=1;
+  iType=type;maxQ=num;qCount=0;messages=[];
 
-  render();
-  setTimeout(()=>{
-    const msgsDiv=document.getElementById("msgs");
-    if(msgsDiv)msgsDiv.parentElement.scrollTop=msgsDiv.parentElement.scrollHeight;
-  },100);
+  // Switch page
+  document.getElementById("setupPage").classList.remove("on");
+  const iv=document.getElementById("ivPage");
+  iv.classList.add("on");iv.style.display="flex";
+
+  document.getElementById("ivTitle").textContent=LABELS[type]||"🎙️ Interview";
+  document.getElementById("ivSub").textContent=`${num} questions · Live feedback`;
+  document.getElementById("progFill").style.width="0%";
+  document.getElementById("msgs").innerHTML="";
+
+  addBubble("sys","Starting your interview...");
+
+  messages.push({role:"user",content:OPENERS[type]});
+  showTyping();
+  const resp=await callAI();
+  hideTyping();
+
+  if(resp){
+    messages.push({role:"assistant",content:resp});
+    addBubble("ai",resp);
+    speak(resp);
+  }
+  document.getElementById("chatInput").focus();
 }
 
-function savePro(){
-  state.profile=document.getElementById("profta").value;
-  save();toast("✓ Saved!");
+// ── SEND ANSWER ──
+async function send(){
+  const el=document.getElementById("chatInput");
+  const text=el.value.trim();
+  if(!text)return;
+  el.value="";el.style.height="42px";
+  stopSpeak();stopRec();
+
+  messages.push({role:"user",content:text});
+  addBubble("user",text);
+
+  showTyping();
+  const resp=await callAI();
+  hideTyping();
+
+  if(resp){
+    qCount++;
+    updateProg();
+    messages.push({role:"assistant",content:resp});
+    addBubble("ai",resp);
+    speak(resp);
+
+    if(qCount>=maxQ){
+      setTimeout(()=>addBubble("sys","Interview complete ✓ See your debrief above"),800);
+    }
+  }
+  el.focus();
+}
+
+// ── CHAT UI ──
+function addBubble(role,text){
+  const box=document.getElementById("msgs");
+  if(role==="user"){const l=document.createElement("div");l.className="lbl r";l.textContent="You";box.appendChild(l)}
+  else if(role==="ai"){const l=document.createElement("div");l.className="lbl";l.textContent="Interviewer";box.appendChild(l)}
+  const b=document.createElement("div");b.className="bubble "+role;b.textContent=text;
+  box.appendChild(b);
+  box.scrollTop=box.scrollHeight;
+}
+function showTyping(){
+  const box=document.getElementById("msgs");
+  const l=document.createElement("div");l.className="lbl";l.textContent="Interviewer";box.appendChild(l);
+  const b=document.createElement("div");b.id="typing";b.className="bubble ai";
+  b.innerHTML=`<div class="thinking-dots"><span></span><span></span><span></span></div>`;
+  box.appendChild(b);box.scrollTop=box.scrollHeight;
+}
+function hideTyping(){const t=document.getElementById("typing");if(t){t.previousSibling?.remove();t.remove()}}
+function updateProg(){
+  document.getElementById("progFill").style.width=Math.min((qCount/maxQ)*100,100)+"%";
+  document.getElementById("ivSub").textContent=`Question ${Math.min(qCount+1,maxQ)} of ${maxQ}`;
 }
 
 function endInterview(){
-  state.page="setup";
-  render();
+  stopSpeak();stopRec();
+  document.getElementById("ivPage").classList.remove("on");
+  document.getElementById("ivPage").style.display="none";
+  document.getElementById("setupPage").classList.add("on");
+  notesOpen=false;document.getElementById("notesCol").classList.remove("on");
   toast("Interview ended");
 }
 
-// Init
-render();
+// ── VOICE OUTPUT (TTS) ──
+function toggleVoice(){
+  voiceOn=!voiceOn;
+  const btn=document.getElementById("voiceBtn");
+  btn.textContent=voiceOn?"🔊 Voice":"🔇 Voice";
+  btn.classList.toggle("on",voiceOn);
+  if(!voiceOn)stopSpeak();
+  toast(voiceOn?"Voice on":"Voice off");
+}
+function speak(text){
+  if(!voiceOn||!synth)return;
+  stopSpeak();
+  const u=new SpeechSynthesisUtterance(text);
+  u.rate=0.93;u.pitch=1;u.volume=1;
+  const voices=synth.getVoices();
+  const v=voices.find(v=>v.name.includes("Samantha")||v.name.includes("Karen")||v.name.includes("Daniel")||(v.lang.startsWith("en")&&!v.name.includes("Google")));
+  if(v)u.voice=v;
+  synth.speak(u);
+}
+function stopSpeak(){if(synth?.speaking)synth.cancel()}
+
+// ── VOICE INPUT (STT) ──
+function initSpeech(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR)return;
+  recognition=new SR();recognition.continuous=true;recognition.interimResults=true;recognition.lang="en-US";
+  recognition.onresult=(e)=>{
+    let final="";
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal)final+=e.results[i][0].transcript+" ";
+    }
+    if(final){
+      const inp=document.getElementById("chatInput");
+      if(inp)inp.value=(inp.value+final).trim();
+    }
+  };
+  recognition.onend=()=>{isRec=false;updateMicUI()};
+  recognition.onerror=()=>{isRec=false;updateMicUI()};
+}
+function toggleMic(){
+  if(!recognition){toast("Voice input not supported on this browser","var(--amber)");return}
+  if(isRec)stopRec();else startRec();
+}
+function startRec(){
+  stopSpeak();
+  try{recognition.start();isRec=true;document.getElementById("recBar").classList.add("on");updateMicUI()}catch(e){}
+}
+function stopRec(){
+  if(recognition&&isRec)try{recognition.stop()}catch(e){}
+  isRec=false;document.getElementById("recBar").classList.remove("on");updateMicUI();
+}
+function updateMicUI(){
+  const b=document.getElementById("micBtn");
+  if(b){b.className="mic-btn"+(isRec?" rec":"");b.textContent=isRec?"⏹":"🎤"}
+}
+
+// ── NOTES PANEL ──
+function toggleNotes(){
+  notesOpen=!notesOpen;
+  document.getElementById("notesCol").classList.toggle("on",notesOpen);
+  const btn=document.getElementById("notesBtn");
+  btn.classList.toggle("on",notesOpen);
+  if(notesOpen&&curTab==="draw")setTimeout(resizeCanvas,150);
+}
+function switchTab(tab){
+  curTab=tab;
+  document.getElementById("notesTab").style.display=tab==="notes"?"flex":"none";
+  document.getElementById("drawTab").style.display=tab==="draw"?"flex":"none";
+  document.getElementById("tab-notes").className="ntab"+(tab==="notes"?" on":"");
+  document.getElementById("tab-draw").className="ntab"+(tab==="draw"?" on":"");
+  if(tab==="draw")setTimeout(resizeCanvas,100);
+}
+
+// ── CANVAS / WHITEBOARD ──
+function initCanvas(){
+  const canvas=document.getElementById("wbCanvas");
+  if(!canvas)return;
+  ctx=canvas.getContext("2d");
+  ctx.lineCap="round";ctx.lineJoin="round";
+
+  function pos(e,cv){
+    const r=cv.getBoundingClientRect();
+    const sx=cv.width/r.width,sy=cv.height/r.height;
+    const src=e.touches?e.touches[0]:e;
+    return{x:(src.clientX-r.left)*sx,y:(src.clientY-r.top)*sy};
+  }
+  function startDraw(e){e.preventDefault();drawing=true;const p=pos(e,canvas);lx=p.x;ly=p.y}
+  function doDraw(e){
+    e.preventDefault();if(!drawing||!ctx)return;
+    const p=pos(e,canvas);
+    ctx.beginPath();ctx.moveTo(lx,ly);ctx.lineTo(p.x,p.y);
+    if(drawTool==="eraser"){ctx.strokeStyle="#1C1C34";ctx.lineWidth=18}
+    else{ctx.strokeStyle=drawClr;ctx.lineWidth=2.5}
+    ctx.stroke();lx=p.x;ly=p.y;
+  }
+  function endDraw(){drawing=false}
+
+  canvas.addEventListener("mousedown",startDraw);
+  canvas.addEventListener("mousemove",doDraw);
+  canvas.addEventListener("mouseup",endDraw);
+  canvas.addEventListener("mouseleave",endDraw);
+  canvas.addEventListener("touchstart",startDraw,{passive:false});
+  canvas.addEventListener("touchmove",doDraw,{passive:false});
+  canvas.addEventListener("touchend",endDraw);
+}
+function resizeCanvas(){
+  const cv=document.getElementById("wbCanvas");
+  const wrap=document.getElementById("canvasWrap");
+  if(!cv||!wrap||!ctx)return;
+  const img=ctx.getImageData(0,0,cv.width,cv.height);
+  cv.width=wrap.offsetWidth||300;cv.height=Math.max(wrap.offsetHeight,200)||400;
+  ctx.lineCap="round";ctx.lineJoin="round";
+  try{ctx.putImageData(img,0,0)}catch(e){}
+}
+function setTool(t,btn){
+  drawTool=t;
+  document.querySelectorAll(".tool-btn").forEach(b=>b.classList.remove("on"));
+  btn.classList.add("on");
+}
+function setClr(c,dot){
+  drawClr=c;
+  document.querySelectorAll(".clr-dot").forEach(d=>d.classList.remove("on"));
+  dot.classList.add("on");
+}
+function clearCanvas(){
+  const cv=document.getElementById("wbCanvas");
+  if(ctx&&cv)ctx.clearRect(0,0,cv.width,cv.height);
+}
+
+// Auto-resize chat textarea
+document.addEventListener("input",e=>{
+  if(e.target?.classList.contains("chat-input")){
+    e.target.style.height="42px";
+    e.target.style.height=Math.min(e.target.scrollHeight,90)+"px";
+  }
+});
 </script>
 </body>
 </html>
